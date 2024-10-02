@@ -1,0 +1,9 @@
+train
+{'TP': 36000, 'FP': 0, 'TN': 0, 'FN': 4000, 'Accuracy': 0.9, 'Precision': 1.0, 'Recall': 0.9, 'TPR': 0, 'FPR': 0, 'F': 0.9473684210526316, 'MCC': 0}
+
+test
+{'TP': 9030, 'FP': 0, 'TN': 0, 'FN': 970, 'Accuracy': 0.903, 'Precision': 1.0, 'Recall': 0.903, 'TPR': 0, 'FPR': 0, 'F': 0.9490278507619548, 'MCC': 0}
+
+full_test
+{'TP': 45030, 'FP': 45824, 'TN': 69908, 'FN': 4970, 'Accuracy': 0.6935172447083243, 'Precision': 0.49563035199330796, 'Recall': 0.9006, 'TPR': 0, 'FPR': 0, 'F': 0.6393854629616482, 'MCC': 0}
+
