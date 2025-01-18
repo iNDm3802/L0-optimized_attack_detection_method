@@ -43,13 +43,20 @@ def get_metrics(clf, X_train, X_test, X_test_full, y_train, y_test, y_test_full,
     plt.ylabel('True labels')
     plt.title(f"{dict_letter}")
 
-    cm_filename = f"{dataset}_binary_cm.png"
+    if 'forest' in model_name:
+        xxx = 'forest'
+    elif 'logistic' in model_name:
+        xxx = 'logistic'
+    elif 'SVM' in model_name:
+        xxx = 'SVM'
+    else:
+        raise BaseException('UNEXPECTED MODEL')
+
+    cm_filename = f"{dataset}_binary_cm_{xxx}.png"
     plt.savefig(Path("conf_matrix") / cm_filename, bbox_inches='tight')
     plt.close()
 
-
-
-    with open(Path('classifications_binary') / metrics_filename, 'w') as f:
+    with open(Path('results/classifications_binary') / metrics_filename, 'w') as f:
         f.write('train\n')
         predicted = clf.predict(X_train)
         f.write(f"{save_metrics(y_train.to_list(), list(predicted))}\n\n")
@@ -65,9 +72,9 @@ def get_metrics(clf, X_train, X_test, X_test_full, y_train, y_test, y_test_full,
         plt.ylabel('True labels')
         plt.title(f"{dict_letter}")
 
-        cm_filename = f"{dataset}_binary_cm.png"
-        plt.savefig(Path("conf_matrix") / cm_filename, bbox_inches='tight')
-        plt.close()
+        # cm_filename = f"{dataset}_binary_cm.png"
+        # plt.savefig(Path("conf_matrix") / cm_filename, bbox_inches='tight')
+        # plt.close()
 
         f.write('full_test\n')
         predicted = clf.predict(X_test_full)
@@ -83,34 +90,35 @@ for data_path in input_data_path:
     dataset = data_path.split('/')[1]
     dict_letter = {'CIFAR10': 'a', 'CIFAR10GRAY': 'b', 'MNIST': 'c', 'LaVAN': 'd'}
     data = pd.read_csv(data_path, index_col=0, encoding="windows-1251")
+    data = data.dropna(axis=0)
     data = data.loc[(data['flag'] == 0) | (data['flag'] == 1)]
     train_data, test_data = train_test_split(data, test_size=0.2, random_state=3802)
     dropped = ['flag', 'title']
 
-    if dataset == 'CIFAR10GRAY':
-        dropped.extend(['mean', 'median', 'range', 'std', '75q', '97q', '3sigma_cnt', '5sigma_cnt', '7sigma_cnt', '3iqr_cnt', '6iqr_cnt'])
-    elif dataset == 'CIFAR10':
-        dropped.extend(['median', 'range', 'std', 'iqr', '7sigma_cnt', '3iqr_cnt', '6iqr_cnt', 'skew'])
-    elif dataset == 'MNIST':
-        dropped.extend(['median', 'range', 'std', '25q', '75q', '95q', '97q', '99q', 'cv', '5sigma_cnt', '3iqr_cnt', '6iqr_cnt'])
-    elif dataset == 'LaVAN':
-        dropped.extend(['median', 'range', 'std', '25q', '75q', '95q', '97q', '99q', 'iqr', '3sigma_cnt', '7sigma_cnt', '3iqr_cnt', '6iqr_cnt'])
+    # if dataset == 'CIFAR10GRAY':  # 54
+    #     dropped.extend(['mean', 'std', '75q', '95q', '97q', '99q', 'iqr', '3iqr_cnt', '6iqr_cnt', 'skew'])
+    # elif dataset == 'CIFAR10':  # 9
+    #     dropped.extend(['median', 'var', '25q', '97q', 'iqr', '3sigma_cnt', '3iqr_cnt', '6iqr_cnt', 'kurt'])
+    # elif dataset == 'MNIST':  # 23
+    #     dropped.extend(['75q', '95q', '5sigma_cnt', '3iqr_cnt', '6iqr_cnt'])
 
     X_train, y_train = train_data.drop(dropped, axis=1), train_data['flag']
     X_test, y_test = test_data.drop(dropped, axis=1), test_data['flag']
     data = pd.read_csv(data_path, index_col=0, encoding="windows-1251")
+    data = data.dropna(axis=0)
     data = data.loc[(data['flag'] == 0) | (data['flag'] == 1)]
     X_test_full, y_test_full = data.drop(dropped, axis=1), data['flag']
 
     best_F = 0
     best_model = ''
-    models = ['logistic', 'forest', 'svm']
+    models = ['logistic', 'forest', 'SVM']
+    # models = ['SVM']
     solvers = ['lbfgs', 'liblinear', 'newton-cg', 'newton-cholesky', 'sag', 'saga']
     kernels_one_class = ['linear', 'rbf', 'poly']
     for model in models:
         if model == 'logistic':
             for solver in solvers:
-                model_name = f'{model}_{dataset}_{solver}_binary.pkl'
+                model_name = f'{model}_{dataset}_binary.pkl'
                 print(f"solver:\t{solver}")
                 metrics_filename = f"{dataset}_{model}_{solver}.txt"
                 clf = LogisticRegression(penalty='l2', solver=solver, random_state=3802)
@@ -123,8 +131,8 @@ for data_path in input_data_path:
                     get_metrics(clf, X_train, X_test, X_test_full, y_train, y_test, y_test_full, metrics_filename, model_name, dict_letter[dataset], dataset)
         elif model == 'forest':
             best_F = 0
-            for n_estimators in range(1, 201):
-                model_name = f'{model}_{dataset}_{n_estimators}_binary.pkl'
+            for n_estimators in range(1, 101):
+                model_name = f'{model}_{dataset}_binary.pkl'
                 print(f"n_estimators:\t{n_estimators}")
                 metrics_filename = f"{dataset}_{model}_{n_estimators}.txt"
                 clf = RandomForestClassifier(n_estimators=n_estimators)
@@ -135,13 +143,13 @@ for data_path in input_data_path:
                     best_F = F
                     best_model = metrics_filename
                     get_metrics(clf, X_train, X_test, X_test_full, y_train, y_test, y_test_full, metrics_filename, model_name, dict_letter[dataset], dataset)
-        elif model == 'svm':
+        elif model == 'SVM':
             best_F = 0
             for kernel in kernels_one_class:
                 print(f"kernel:\t{kernel}")
+                model_name = f'{model}_{dataset}_binary.pkl'
                 if kernel == 'poly':
                     for deg in range(1, 3):
-                        model_name = f"{dataset}_svm_{kernel}_{deg}_binary.pkl"
                         metrics_filename = f"{dataset}_svm_{kernel}_{deg}.txt"
                         clf = svm.SVC(kernel=kernel, degree=deg)
                         clf.fit(X_train, y_train)
@@ -152,7 +160,6 @@ for data_path in input_data_path:
                             best_model = metrics_filename
                             get_metrics(clf, X_train, X_test, X_test_full, y_train, y_test, y_test_full, metrics_filename, model_name, dict_letter[dataset], dataset)
                 else:
-                    model_name = f"{dataset}_svm_{kernel}_binary.pkl"
                     metrics_filename = f"{dataset}_svm_{kernel}.txt"
                     clf = svm.SVC(kernel=kernel)
                     clf.fit(X_train, y_train)

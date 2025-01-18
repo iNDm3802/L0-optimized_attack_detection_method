@@ -1,0 +1,9 @@
+train
+{'accuracy': 0.9997623805152023, 'f1': np.float64(0.9998687053150476), 'precision': np.float64(0.9998209703407531), 'recall': np.float64(0.9999164448476312)}
+
+test
+{'accuracy': 0.9950749557178036, 'f1': np.float64(0.9972908745247149), 'precision': np.float64(0.9963910916947624), 'recall': np.float64(0.9981922839065697)}
+
+full_test
+{'accuracy': 0.9988248712542771, 'f1': np.float64(0.9993512750307667), 'precision': np.float64(0.9991320437984053), 'recall': np.float64(0.999570602492414)}
+

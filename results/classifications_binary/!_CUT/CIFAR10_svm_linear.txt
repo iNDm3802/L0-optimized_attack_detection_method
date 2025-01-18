@@ -1,9 +1,9 @@
 train
-{'accuracy': 0.9999891991143274, 'f1': np.float64(0.9999940318104503), 'precision': np.float64(0.9999880636921388), 'recall': np.float64(1.0)}
+{'accuracy': 0.9859156450828968, 'f1': np.float64(0.9921989040178038), 'precision': np.float64(0.9945669772964415), 'recall': np.float64(0.989842080762023)}
 
 test
-{'accuracy': 1.0, 'f1': np.float64(1.0), 'precision': np.float64(1.0), 'recall': np.float64(1.0)}
+{'accuracy': 0.9862185164384153, 'f1': np.float64(0.992389722546938), 'precision': np.float64(0.9953579632465543), 'recall': np.float64(0.9894391322962751)}
 
 full_test
-{'accuracy': 0.999991359347458, 'f1': np.float64(0.9999952289393456), 'precision': np.float64(0.9999904579242168), 'recall': np.float64(1.0)}
+{'accuracy': 0.9859762209242042, 'f1': np.float64(0.9922371611829361), 'precision': np.float64(0.9947254854950851), 'recall': np.float64(0.9897612549857822)}
 

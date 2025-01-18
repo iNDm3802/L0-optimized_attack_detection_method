@@ -18,7 +18,7 @@ def load_text_data(text_file_path):
 def normalize_statistics(statistics, count_values, factor=1000):
     return [stat / count_values * factor for stat in statistics]
 
-def process_file(file, path_to_folder="D:\zzz ImageNet+LaVAN"):
+def process_file(file, path_to_folder="E:/_scores/ImageNet/all"):
     file_data = load_text_data(os.path.join(path_to_folder, file))
     title = os.path.splitext(os.path.basename(file))[0].split(',')[0][2:-1]
     count_values = len(file_data)
@@ -84,11 +84,15 @@ def txt_files2csv(path_to_folder, suffix=None, num_workers=8):
     print(path_to_folder)
     if suffix == "px":
         text_files = [f for f in os.listdir(path_to_folder) if
-                      f.endswith('.txt') and not "clean" in f and not "jsma" in f]
-    elif suffix:
+                      f.endswith('.txt') and not "original" in f and not "jsma" in f and not "clean" in f]
+    elif suffix == "jsma":
         text_files = [f for f in os.listdir(path_to_folder) if f.endswith('.txt') and suffix in f]
-    else:
-        text_files = [f for f in os.listdir(path_to_folder) if f.endswith('.txt')]
+    elif suffix == "clean":
+        text_files = [f for f in os.listdir(path_to_folder) if f.endswith('.txt') and (suffix in f or "original" in f)]
+    elif suffix == "original":
+        text_files = [f for f in os.listdir(path_to_folder) if f.endswith('.txt') and suffix in f]
+    elif suffix == "adversarial":
+        text_files = [f for f in os.listdir(path_to_folder) if f.endswith('.txt') and suffix in f]
     file_info_list = [file for file in text_files]
 
     with WorkerPool(n_jobs=num_workers) as pool:
@@ -109,8 +113,8 @@ def collect_data(dataset_name, dataset_path, normalize=False, num_workers=8):
     output_path.mkdir(parents=True, exist_ok=True)
     
     if dataset_name == 'LaVAN':
-        lavan_clean_df = txt_files2csv(Path(dataset_path), suffix="original", normalize=normalize, num_workers=num_workers)
-        lavan_adv_df = txt_files2csv(Path(dataset_path), suffix="adversarial", normalize=normalize, num_workers=num_workers)
+        lavan_clean_df = txt_files2csv(Path(dataset_path), suffix="original", num_workers=num_workers)
+        lavan_adv_df = txt_files2csv(Path(dataset_path), suffix="adversarial", num_workers=num_workers)
 
         lavan_clean_df['flag'] = 0
         lavan_adv_df['flag'] = 1
@@ -123,9 +127,9 @@ def collect_data(dataset_name, dataset_path, normalize=False, num_workers=8):
         merged_data.to_csv(output_path / 'merged_data.csv', index=False)
         merged_data_cleaned.to_csv(output_path / 'merged_data_cleaned.csv', index=False)
     else:
-        clean_df = txt_files2csv(Path(dataset_path), suffix="clean", normalize=normalize, num_workers=num_workers)
-        px_df = txt_files2csv(Path(dataset_path), suffix="px", normalize=normalize, num_workers=num_workers)
-        jsma_df = txt_files2csv(Path(dataset_path), suffix="jsma", normalize=normalize, num_workers=num_workers)
+        clean_df = txt_files2csv(Path(dataset_path), suffix="clean", num_workers=num_workers)
+        px_df = txt_files2csv(Path(dataset_path), suffix="px", num_workers=num_workers)
+        jsma_df = txt_files2csv(Path(dataset_path), suffix="jsma", num_workers=num_workers)
         
         clean_df['flag'] = 0
         px_df['flag'] = 1
